@@ -1,0 +1,18 @@
+# Free 15-minute scheduler (Vercel Hobby crons only run once a day).
+# In your GitHub repo: Settings → Secrets and variables → Actions → add
+#   APP_BASE_URL  e.g. https://ghl-health.vercel.app
+#   CRON_SECRET   same value as in Vercel
+# GitHub may delay scheduled runs by a few minutes; that's fine for health checks.
+name: Health scan
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger scan
+        run: |
+          curl -fsS -X POST "${{ secrets.APP_BASE_URL }}/api/cron/scan" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" --max-time 70
