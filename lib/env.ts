@@ -21,7 +21,9 @@ export const env = {
     return process.env.GHL_APP_ID || (process.env.GHL_CLIENT_ID ?? "").split("-")[0];
   },
   get baseUrl() {
-    return (process.env.APP_BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+    // Falls back to the Vercel production domain, then localhost for local development.
+    const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "";
+    return (process.env.APP_BASE_URL || vercel || "http://localhost:3000").replace(/\/$/, "");
   },
   get sessionSecret() {
     return required("SESSION_SECRET", "dev-only-session-secret-change-me");

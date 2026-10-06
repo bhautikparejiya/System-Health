@@ -22,20 +22,33 @@ export async function POST(req: Request) {
   }
 
   if (!body.encryptedData) return NextResponse.json({ error: "Missing encryptedData" }, { status: 400 });
+  for (const name of ["GHL_SHARED_SECRET", "SESSION_SECRET"]) {
+    if (!process.env[name]) {
+      return NextResponse.json({ error: `Server setup: ${name} is not set in Vercel. Add it and redeploy.` }, { status: 500 });
+    }
+  }
   let ctx;
   try {
     ctx = decryptUserContext(body.encryptedData);
   } catch {
-    return NextResponse.json({ error: "Invalid user context" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Could not read your HighLevel session. Check that GHL_SHARED_SECRET matches the Shared Secret in the developer portal." },
+      { status: 401 },
+    );
   }
 
-  const locationId = ctx.activeLocation ?? null;
-  const installed = locationId
-    ? !!(await q1(`select 1 from installations where location_id = $1`, [locationId]))
-    : !!(await q1(`select 1 from installations where company_id = $1 limit 1`, [ctx.companyId]));
+  try {
+    const locationId = ctx.activeLocation ?? null;
+    const installed = locationId
+      ? !!(await q1(`select 1 from installations where location_id = $1`, [locationId]))
+      : !!(await q1(`select 1 from installations where company_id = $1 limit 1`, [ctx.companyId]));
 
-  return NextResponse.json({
-    token: createSession({ userId: ctx.userId, companyId: ctx.companyId, locationId: locationId ?? undefined, role: ctx.role, name: ctx.userName }),
-    context: { type: locationId ? "location" : "agency", locationId, companyId: ctx.companyId, userName: ctx.userName, installed },
-  });
+    return NextResponse.json({
+      token: createSession({ userId: ctx.userId, companyId: ctx.companyId, locationId: locationId ?? undefined, role: ctx.role, name: ctx.userName }),
+      context: { type: locationId ? "location" : "agency", locationId, companyId: ctx.companyId, userName: ctx.userName, installed },
+    });
+  } catch (e) {
+    console.error("[sso] failed", e);
+    return NextResponse.json({ error: `Server error: ${(e as Error).message}` }, { status: 500 });
+  }
 }
