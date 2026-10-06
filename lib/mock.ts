@@ -91,11 +91,15 @@ export async function mockGhl<T>(locationId: string, path: string, req: { query?
       total: 12,
     });
 
+  if (path === "/opportunities/pipelines")
+    return r({ pipelines: [{ id: "p_sales", name: "Sales" }, { id: "p_onboard", name: "Onboarding" }] });
+
   if (path === "/opportunities/search")
     return r({
       opportunities: Array.from({ length: 52 }, (_, i) => ({
         id: `o${i}`,
         status: "open",
+        pipelineId: i % 3 ? "p_sales" : "p_onboard",
         lastStageChangeAt: ago((i < 37 ? 20 + i : 2) * D),
         createdAt: ago(60 * D),
       })),

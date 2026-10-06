@@ -175,46 +175,67 @@ export async function checkInbox(ctx: CheckContext): Promise<ModuleResult> {
 
 interface Opportunity {
   id: string;
+  pipelineId?: string;
   lastStageChangeAt?: string;
   lastStatusChangeAt?: string;
   updatedAt?: string;
   createdAt?: string;
 }
 
+interface Pipeline {
+  id: string;
+  name: string;
+}
+
 export async function checkPipelines(ctx: CheckContext): Promise<ModuleResult> {
   const { locationId: loc, settings, now } = ctx;
-  const all: Opportunity[] = [];
+  const { pipelines = [] } = await ctx.api<{ pipelines?: Pipeline[] }>("/opportunities/pipelines", {
+    version: V.opportunities,
+    query: { locationId: loc },
+  });
+  if (!pipelines.length) return result("pipelines", "0", [{ label: "No pipelines", tone: "info" }], [], { status: "na" });
+
+  const open: Opportunity[] = [];
   for (let page = 1; page <= 5; page++) {
     const res = await ctx.api<{ opportunities?: Opportunity[] }>("/opportunities/search", {
       version: V.opportunities,
       query: { location_id: loc, status: "open", limit: 100, page },
     });
     const batch = res.opportunities ?? [];
-    all.push(...batch);
+    open.push(...batch);
     if (batch.length < 100) break;
   }
-  if (!all.length) return result("pipelines", "0", [{ label: "No open deals", tone: "info" }], [], { status: "na" });
 
   const staleMs = settings.staleDealDays * DAY;
-  const stale = all.filter((o) => {
+  const stale = open.filter((o) => {
     const t = toTime(o.lastStageChangeAt) ?? toTime(o.lastStatusChangeAt) ?? toTime(o.createdAt);
     return t !== null && now.getTime() - t > staleMs;
   });
   const issues: Issue[] = [];
   if (stale.length) {
+    const names = new Map(pipelines.map((p) => [p.id, p.name]));
+    const byPipeline = new Map<string, number>();
+    for (const o of stale) {
+      const name = names.get(o.pipelineId ?? "") ?? "Other";
+      byPipeline.set(name, (byPipeline.get(name) ?? 0) + 1);
+    }
+    const breakdown = [...byPipeline.entries()].sort((a, b) => b[1] - a[1]).map(([n, c]) => `${n}: ${c}`).join(" · ");
     issues.push({
       key: "pipe-stale",
       module: "pipelines",
       severity: "warning",
       title: `${stale.length} open ${stale.length === 1 ? "opportunity" : "opportunities"} with no stage change in ${settings.staleDealDays}+ days`,
-      detail: `${Math.round((stale.length / all.length) * 100)}% of open deals${all.length >= 500 ? " (first 500 checked)" : ""}`,
+      detail: `${breakdown} · ${Math.round((stale.length / open.length) * 100)}% of open deals${open.length >= 500 ? " (first 500 checked)" : ""}`,
       link: links.pipelines(loc),
     });
   }
   return result(
     "pipelines",
-    String(all.length),
-    [{ label: "open", tone: "info" }, ...(stale.length ? [{ label: `${stale.length} stale`, tone: "warn" as const }] : [])],
+    String(pipelines.length),
+    [
+      { label: `${open.length} open ${open.length === 1 ? "deal" : "deals"}`, tone: open.length ? "info" : "ok" },
+      ...(stale.length ? [{ label: `${stale.length} stale`, tone: "warn" as const }] : []),
+    ],
     issues,
   );
 }
