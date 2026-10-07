@@ -15,6 +15,8 @@ export const V = {
   conversations: "2021-04-15",
   voiceAi: "2021-04-15",
   conversationAi: "2021-04-15",
+  payments: "2021-07-28",
+  marketplace: "2021-07-28",
 } as const;
 
 export class GhlError extends Error {

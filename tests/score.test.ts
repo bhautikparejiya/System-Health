@@ -7,7 +7,7 @@ const issue = (severity: Issue["severity"]): Issue => ({ key: Math.random().toSt
 const mod = (key: ModuleResult["key"], status: ModuleResult["status"], issues: Issue[]): ModuleResult => ({
   key, label: key, status, headline: "", chips: [], issues,
 });
-const weights = { workflows: 30, conversationAi: 8, voiceAi: 7, calendars: 10, forms: 8, inbox: 10, pipelines: 5, messaging: 15, leads: 7 };
+const weights = { workflows: 30, conversationAi: 8, voiceAi: 7, calendars: 10, forms: 8, inbox: 10, pipelines: 5, messaging: 15, leads: 7, wallet: 10, payments: 5 };
 
 test("module score subtracts 25 per critical and 8 per warning, info is free", () => {
   assert.equal(moduleScore({ issues: [] }), 100);

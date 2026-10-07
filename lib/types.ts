@@ -7,7 +7,9 @@ export type ModuleKey =
   | "inbox"
   | "pipelines"
   | "messaging"
-  | "leads";
+  | "leads"
+  | "wallet"
+  | "payments";
 
 export type Severity = "critical" | "warning" | "info";
 export type Tone = "ok" | "warn" | "bad" | "info";

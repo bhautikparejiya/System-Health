@@ -15,6 +15,8 @@ const MODULE_LABELS: Record<ModuleKey, string> = {
   pipelines: "Pipelines",
   messaging: "Messaging (SMS / email)",
   leads: "New leads",
+  wallet: "Wallet funds",
+  payments: "Customer payments",
 };
 
 const NUMBERS: { key: keyof Settings; label: string; unit: string; div?: number }[] = [
@@ -29,6 +31,7 @@ const NUMBERS: { key: keyof Settings; label: string; unit: string; div?: number 
   { key: "msgFailWarnPct", label: "Messaging: warning at failure rate", unit: "%" },
   { key: "msgFailCritPct", label: "Messaging: critical at failure rate", unit: "%" },
   { key: "leadsIdleHours", label: "Leads: critical when no new contacts for", unit: "hours" },
+  { key: "failedPaymentsWarn", label: "Payments: warning at failed payments (7 days) ≥", unit: "" },
 ];
 
 export function SettingsPanel({ locationId, auth, onSaved }: { locationId: string; auth: Auth; onSaved: () => void }) {

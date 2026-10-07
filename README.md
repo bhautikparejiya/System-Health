@@ -13,6 +13,10 @@ One health score per sub-account, shown inside HighLevel, covering these checks:
 | Pipelines | Open deals with no stage change in N days | API |
 | Messaging | SMS and email failure rate | Webhooks |
 | New leads | No new contacts in ~48h, or a sharp drop vs. normal | Webhooks |
+| Wallet | Wallet has no funds (SMS, calls, AI would stop) | API |
+| Payments | Failed customer payments (7 days), past-due subscriptions | API |
+
+**Billing tab:** wallet status, 30-day usage (SMS, email, new contacts, Check-in runs), customer payments (net, refunds, failed) and subscriptions (active, past due). HighLevel does not expose the exact wallet balance or per-message cost through its API.
 
 Alerts: a custom workflow trigger, **"Health issue detected"**, fires once for each new issue, so clients can text, email or Slack themselves using normal HighLevel workflows.
 
@@ -73,7 +77,8 @@ Go to https://marketplace.gohighlevel.com, sign up for a developer account, then
   `workflows.readonly`, `conversation-ai.readonly`, `voice-ai-agents.readonly`, `voice-ai-dashboard.readonly`,
   `calendars.readonly`, `calendars/events.readonly`, `forms.readonly`, `conversations.readonly`,
   `conversations/message.readonly`, `opportunities.readonly`, `contacts.readonly`, `locations.readonly`,
-  `oauth.readonly`, `oauth.write` (the last two are needed for agency bulk installs).
+  `oauth.readonly`, `oauth.write` (the last two are needed for agency bulk installs),
+  `charges.readonly`, `payments/transactions.readonly`, `payments/subscriptions.readonly` (Billing tab, wallet and payment checks).
 * **Redirect URL:** `https://<app>/api/oauth/callback`
 * Generate the **Client ID / Client Secret** and copy them into Vercel.
 * **Shared Secret:** click *Generate* and copy it into `GHL_SHARED_SECRET` in Vercel.

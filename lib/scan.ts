@@ -9,6 +9,7 @@ import { checkWorkflows } from "./checks/workflows";
 import { checkConversationAi, checkVoiceAi } from "./checks/ai";
 import { checkCalendars, checkForms, checkInbox, checkPipelines } from "./checks/engagement";
 import { checkLeads, checkMessaging } from "./checks/activity";
+import { checkPayments, checkWallet } from "./checks/billing";
 
 const CHECKS: Record<ModuleKey, (ctx: CheckContext) => Promise<ModuleResult>> = {
   workflows: checkWorkflows,
@@ -20,6 +21,8 @@ const CHECKS: Record<ModuleKey, (ctx: CheckContext) => Promise<ModuleResult>> = 
   pipelines: checkPipelines,
   messaging: checkMessaging,
   leads: checkLeads,
+  wallet: checkWallet,
+  payments: checkPayments,
 };
 
 const SEVERITY_ORDER = { critical: 0, warning: 1, info: 2 } as const;

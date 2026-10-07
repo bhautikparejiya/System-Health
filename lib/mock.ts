@@ -106,6 +106,45 @@ export async function mockGhl<T>(locationId: string, path: string, req: { query?
       meta: { total: 52 },
     });
 
+  if (path === "/marketplace/billing/charges/has-funds") return r({ hasFunds: locationId !== DEMO_LOCATION });
+
+  if (path === "/payments/transactions") {
+    const names = ["Maria Lopez", "John Carter", "Priya Shah", "Tom Becker", "Aisha Khan", "Leo Rossi"];
+    const days = Math.max(1, Math.round((Date.now() - new Date(String(qy.startAt)).getTime()) / D));
+    const count = days > 10 ? 46 : 12;
+    if (Number(qy.offset) > 0) return r({ data: [], totalCount: count });
+    return r({
+      data: Array.from({ length: count }, (_, i) => ({
+        _id: `t${i}`,
+        contactName: names[i % names.length],
+        currency: "usd",
+        amount: [97, 149, 49, 297][i % 4],
+        amountRefunded: i === 5 ? 49 : 0,
+        status: i % 9 === 3 ? "failed" : i === 5 ? "refunded" : "succeeded",
+        entitySourceName: i % 2 ? "Monthly Membership" : "Teeth Whitening Offer",
+        createdAt: ago((i * days * D) / count),
+      })),
+      totalCount: count,
+    });
+  }
+
+  if (path === "/payments/subscriptions") {
+    const states = ["active", "active", "active", "active", "trialing", "past_due", "active", "canceled"];
+    if (Number(qy.offset) > 0) return r({ data: [], totalCount: 24 });
+    return r({
+      data: Array.from({ length: 24 }, (_, i) => ({
+        _id: `s${i}`,
+        contactName: `Member ${i + 1}`,
+        currency: "usd",
+        amount: i % 3 ? 97 : 149,
+        status: states[i % states.length],
+        entitySourceName: "Monthly Membership",
+        createdAt: ago((i + 3) * D),
+      })),
+      totalCount: 24,
+    });
+  }
+
   throw new Error(`Mock has no fixture for ${path}`);
 }
 

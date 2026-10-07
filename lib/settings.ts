@@ -18,6 +18,8 @@ export interface Settings {
   msgFailWarnPct: number;
   msgFailCritPct: number;
   leadsIdleHours: number;
+  /** Failed customer payments in the last 7 days before warning */
+  failedPaymentsWarn: number;
   /** Lowest severity that fires the "Health issue detected" trigger */
   alertMinSeverity: Severity;
 }
@@ -33,6 +35,8 @@ export const DEFAULT_SETTINGS: Settings = {
     pipelines: true,
     messaging: true,
     leads: true,
+    wallet: true,
+    payments: true,
   },
   weights: {
     workflows: 30,
@@ -44,6 +48,8 @@ export const DEFAULT_SETTINGS: Settings = {
     pipelines: 5,
     messaging: 15,
     leads: 7,
+    wallet: 10,
+    payments: 5,
   },
   workflowWindowHours: 72,
   flagUnpublishedWorkflows: true,
@@ -58,6 +64,7 @@ export const DEFAULT_SETTINGS: Settings = {
   msgFailWarnPct: 2,
   msgFailCritPct: 5,
   leadsIdleHours: 48,
+  failedPaymentsWarn: 1,
   alertMinSeverity: "warning",
 };
 
@@ -88,6 +95,7 @@ const NUMBER_LIMITS: Partial<Record<keyof Settings, [number, number]>> = {
   msgFailWarnPct: [0.1, 100],
   msgFailCritPct: [0.1, 100],
   leadsIdleHours: [6, 24 * 30],
+  failedPaymentsWarn: [1, 1000],
 };
 
 /** Validates and stores a partial settings update. Unknown keys are ignored. */

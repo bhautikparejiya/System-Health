@@ -5,6 +5,7 @@ import type { Issue, ModuleKey, ModuleResult, Severity } from "@/lib/types";
 import { scoreBand } from "@/lib/score";
 import { api, ghlOrigin, timeAgo, type Auth, type HealthResponse } from "./client";
 import { SettingsPanel } from "./SettingsPanel";
+import { BillingPanel } from "./BillingPanel";
 
 const SEV_LABEL: Record<Severity, string> = { critical: "Critical", warning: "Warning", info: "Info" };
 const SEV_TONE: Record<Severity, string> = { critical: "t-bad", warning: "t-warn", info: "t-info" };
@@ -75,7 +76,7 @@ export function Dashboard({ locationId, auth, compact = false, onBack }: { locat
   const [data, setData] = useState<HealthResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
-  const [tab, setTab] = useState<"overview" | "settings">("overview");
+  const [tab, setTab] = useState<"overview" | "billing" | "settings">("overview");
   const [sev, setSev] = useState<Severity | "all">("all");
   const [mod, setMod] = useState<ModuleKey | null>(null);
 
@@ -141,12 +142,15 @@ export function Dashboard({ locationId, auth, compact = false, onBack }: { locat
       {!data.readOnly && !compact && (
         <div className="tabs">
           <button className={tab === "overview" ? "on" : ""} onClick={() => setTab("overview")}>Overview</button>
+          <button className={tab === "billing" ? "on" : ""} onClick={() => setTab("billing")}>Billing</button>
           <button className={tab === "settings" ? "on" : ""} onClick={() => setTab("settings")}>Settings</button>
         </div>
       )}
 
       {tab === "settings" ? (
         <SettingsPanel locationId={locationId} auth={auth} onSaved={load} />
+      ) : tab === "billing" ? (
+        <BillingPanel locationId={locationId} auth={auth} />
       ) : (
         <>
           <div className="top" style={{ marginTop: compact || data.readOnly ? 12 : 0 }}>

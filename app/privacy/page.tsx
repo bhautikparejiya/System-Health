@@ -9,7 +9,8 @@ export default function Privacy() {
       <p>
         With your permission (OAuth scopes granted at install) the app reads workflow names and status, Conversation AI and Voice AI agent
         settings and call counts, calendar availability, form submission dates, conversation timestamps, opportunity stage dates and event
-        notifications (new contacts, message delivery status, appointments). The app only requests read access.
+        notifications (new contacts, message delivery status, appointments), whether the wallet has funds, and payment transactions and
+        subscriptions (shown live in the Billing tab, never stored). The app only requests read access.
       </p>
       <h3>Data we store</h3>
       <p>

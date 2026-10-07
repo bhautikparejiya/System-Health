@@ -23,6 +23,8 @@ export const LABELS: Record<ModuleKey, string> = {
   pipelines: "Pipelines",
   messaging: "Messaging",
   leads: "New Leads",
+  wallet: "Wallet",
+  payments: "Payments",
 };
 
 /** Paths inside the HighLevel web app (prefixed with the agency's own domain in the browser). */
@@ -36,6 +38,9 @@ export const links = {
   inbox: (l: string) => `/v2/location/${l}/conversations/conversations`,
   pipelines: (l: string) => `/v2/location/${l}/opportunities/list`,
   contacts: (l: string) => `/v2/location/${l}/contacts/smart_list/All`,
+  wallet: (l: string) => `/v2/location/${l}/settings/company-billing`,
+  payments: (l: string) => `/v2/location/${l}/payments/transactions`,
+  subscriptions: (l: string) => `/v2/location/${l}/payments/subscriptions`,
 };
 
 /** Builds a module result and derives status from its issues. */
